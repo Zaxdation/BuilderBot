@@ -33,14 +33,6 @@ import sx.blah.discord.handle.obj.Permissions;
  */
 public class Run implements CommandExecutor{
     
-        public static ArrayList customerList = new ArrayList<String>();
-    public static int amount = 0;
-    public static File folder = new File("C:/customers/");
-public static File[] listOfFiles = folder.listFiles();
-public static int lookingForValue = 0;
-    public static int searcherID = 0;
-    public static String name = null;
-    public static int unpaid = 0;
     public static boolean activated = true;
     
     /*
@@ -175,43 +167,82 @@ public static int lookingForValue = 0;
             reportUserCommand(event, argsList);
             
         }
+                if(event.getMessage().getContent().startsWith(BotUtils.BOT_PREFIX + "help")){
+             String[] argArray = event.getMessage().getContent().split(" ");
+          // First ensure at least the command and prefix is present, the arg length can be handled by your command func
+        if(argArray.length == 0)
+            return;
+
+        // Check if the first arg (the command) starts with the prefix defined in the utils class
+        if(!argArray[0].startsWith(BotUtils.BOT_PREFIX))
+            return;
+
+        // Extract the "command" part of the first arg out by just ditching the first character
+        String commandStr = argArray[0].substring(1);
+
+        // Load the rest of the args in the array into a List for safer access
+        List<String> argsList = new ArrayList<>(Arrays.asList(argArray));
+        argsList.remove(0); // Remove the command
+            helpCommand(event, argsList);
+            
+        }
+                if(event.getMessage().getContent().startsWith(BotUtils.BOT_PREFIX + "prefix")){
+             String[] argArray = event.getMessage().getContent().split(" ");
+          // First ensure at least the command and prefix is present, the arg length can be handled by your command func
+        if(argArray.length == 0)
+            return;
+
+        // Check if the first arg (the command) starts with the prefix defined in the utils class
+        if(!argArray[0].startsWith(BotUtils.BOT_PREFIX))
+            return;
+
+        // Extract the "command" part of the first arg out by just ditching the first character
+        String commandStr = argArray[0].substring(1);
+
+        // Load the rest of the args in the array into a List for safer access
+        List<String> argsList = new ArrayList<>(Arrays.asList(argArray));
+        argsList.remove(0); // Remove the command
+            changePrefixCommand(event, argsList);
+            
+        }
          }
     }
             
                public static void removeUselessCommand(MessageReceivedEvent event, List<String> args) throws IOException{
                    event.getAuthor().addRole(event.getGuild().getRoleByID(440546834088329257L));
-                   //BotUtils.sendMessage(event.getChannel(), "Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                   System.out.println("Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                 // BotUtils.sendMessage(event.getChannel(), "Added role is: " + event.getGuild().getRoleByID(Long.parseLong(args.get(0))).getName());
+                   System.out.println("Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));     
             BotUtils.sendMessage(event.getChannel(), "``You are now given exemption to unsee useless channels``");
-    
      }
                   public static void sayCommand(MessageReceivedEvent event, long channelId, String text) throws IOException{;
-                   //BotUtils.sendMessage(event.getChannel(), "Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                  // System.out.println("Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                 // BotUtils.sendMessage(event.getChannel(), "Added role is: " + event.getGuild().getRoleByID(Long.parseLong(args.get(0))).getName());
             BotUtils.sendMessage(event.getGuild().getChannelByID(channelId), text);
-    
      }
                   
                    public static void helpCommand(MessageReceivedEvent event, List<String> args) throws IOException{
-                   //event.getAuthor().addRole(event.getGuild().getRoleByID(440546834088329257L));
-                   //BotUtils.sendMessage(event.getChannel(), "Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                   //System.out.println("Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                 // BotUtils.sendMessage(event.getChannel(), "Added role is: " + event.getGuild().getRoleByID(Long.parseLong(args.get(0))).getName());
-            BotUtils.sendMessage(event.getChannel(), "** Builder Bot Help v1.0 ** \n -report : Reports a staff/a member \n Usage: b+report <@user> <2 word reason> \n -developer : Contacts the Builder Bot developer \n Usage: b+developer \n -swear-bypass : Adds the swear-bypass role \n Usage: b+swear-bypass");
+            BotUtils.sendMessage(event.getChannel(), "** Builder Bot Help v1.0 ** \n -report : Reports a staff/a member \n Usage: report <@user> <reason> \n -developer : Contacts the Builder Bot developer \n Usage: developer \n -swear-bypass : Adds the swear-bypass role \n Usage: swear-bypass \n -prefix : Changes the prefix \n Usage: prefix <prefix>");
     
      }
                
                public static void addBypassCommand(MessageReceivedEvent event, List<String> args) throws IOException{
                    event.getAuthor().addRole(event.getGuild().getRoleByID(437146715884355584L));
-                   //BotUtils.sendMessage(event.getChannel(), "Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                   //System.out.println("Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                 // BotUtils.sendMessage(event.getChannel(), "Added role is: " + event.getGuild().getRoleByID(Long.parseLong(args.get(0))).getName());
             BotUtils.sendMessage(event.getChannel(), "``You are now given exemption to swearing!``");
     
      }
                
+                  public static void changePrefixCommand(MessageReceivedEvent event, List<String> args) throws IOException{
+                 if(args.get(0) != null){
+                      if(event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.MANAGE_SERVER)){
+            BotUtils.sendMessage(event.getChannel(), "``Successfully changed bot prefix.``");
+            FileUtils.createUserData(args.get(0));
+            BotUtils.BOT_PREFIX = FileUtils.getStringData("config.properties", "botprefix");
+                 } else if(!(event.getAuthor().getPermissionsForGuild(event.getGuild()).contains(Permissions.MANAGE_SERVER))){
+                     BotUtils.sendMessage(event.getChannel(), "``You do not have permission **MANAGE_SERVER** to run this command!``");
+                 }
+                 } else if(args.get(0) == null){
+                      BotUtils.sendMessage(event.getChannel(), "``Unknown command line!``");
+                 }
+    
+     }
+               // Report User Command
                public static void reportUserCommand(MessageReceivedEvent event, List<String> args) throws IOException{
                 //  if(args.get(0) != null && args.get(1) != null && args.get(2) != null){
                 StringBuilder buffer = new StringBuilder();
@@ -227,53 +258,8 @@ System.out.println(buffer.toString());
              BotUtils.sendMessage(event.getGuild().getChannelByID(440583799403970570L), "``" + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " has been reported for " +  joined + "``");
             event.getAuthor().getOrCreatePMChannel().sendMessage("``Thank you for reporting, there will be a investigation happening in awhile.``");
             event.getGuild().getUserByID(221536817969627136L).getOrCreatePMChannel().sendMessage("User : " + event.getAuthor().getName() + " has reported " + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " for " +  joined + "``");
-                   //BotUtils.sendMessage(event.getChannel(), "Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                   //System.out.println("Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                 // BotUtils.sendMessage(event.getChannel(), "Added role is: " + event.getGuild().getRoleByID(Long.parseLong(args.get(0))).getName());
-                         }
-                 
-                   }
-              /*   if(args.size() == 1){
-               //   if(args.get(0) != null && args.get(1) != null && args.get(2) == null){
-                     if(args.get(0).contains("@")){
-                        
-                         
-                                     BotUtils.sendMessage(event.getChannel(), "``You have reported " + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " for " + args.get(1) + "``");
-             BotUtils.sendMessage(event.getGuild().getChannelByID(440583799403970570L), "``" + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " has been reported for " + args.get(1)+ "``");
-            event.getAuthor().getOrCreatePMChannel().sendMessage("``Thank you for reporting, there will be a investigation happening in awhile.``");
-            event.getGuild().getUserByID(221536817969627136L).getOrCreatePMChannel().sendMessage("User : " + event.getAuthor().getName() + " has reported " + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " for " + args.get(1) + "``");
-                   //BotUtils.sendMessage(event.getChannel(), "Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                   //System.out.println("Available roles: " + event.getAuthor().getRolesForGuild(event.getGuild()));
-                 // BotUtils.sendMessage(event.getChannel(), "Added role is: " + event.getGuild().getRoleByID(Long.parseLong(args.get(0))).getName());
-                         }
-                 
-                   }
-                 /*  if(args.size() == 2){
-                       if(args.get(0).contains("@")){
-                   //if(args.get(0) != null && args.get(1) != null && args.get(2) != null){
-                      BotUtils.sendMessage(event.getChannel(), "``You have reported " + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " for " + args.get(1) + " " + args.get(2) + "``");
-             BotUtils.sendMessage(event.getGuild().getChannelByID(440583799403970570L), "``" + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " has been reported for " + args.get(1) + " " + args.get(2) + "``");
-            event.getAuthor().getOrCreatePMChannel().sendMessage("``Thank you for reporting, there will be a investigation happening in awhile.``");
-            event.getGuild().getUserByID(221536817969627136L).getOrCreatePMChannel().sendMessage("User : " + event.getAuthor().getName() + " has reported " + event.getGuild().getUserByID(Long.parseLong(args.get(0).replace("@", "").replace("<", "").replace(">", "").replace("!", ""))).getName() + " for " + args.get(1) +  " " + args.get(2) +"``");
-                 }*/
-                     /* else if(args.get(0).contains("@") == false)
-
-                   BotUtils.sendMessage(event.getChannel(), "``You have reported " + args.get(0) + " for " + args.get(1) + "``");
-             BotUtils.sendMessage(event.getGuild().getChannelByID(440583799403970570L), "``" + args.get(0) + " has been reported for " + args.get(1));
-            event.getAuthor().getOrCreatePMChannel().sendMessage("``Thank you for reporting, there will be a investigation happening in awhile.``");
-            event.getGuild().getUserByID(221536817969627136L).getOrCreatePMChannel().sendMessage("User : " + event.getAuthor().getName() + " has reported " + args.get(0) + " for " + args.get(1) + "``");
-                 } *///if(args.get(2) != null){
-                    // BotUtils.sendMessage(event.getChannel(), "``Please use only 1 word reason for example abuse and explain in the investigation that will be conducted soon.``");
-                 //}
-                 
-              // }
-              // }
-               //}
-
-
-
-     
-
+                     }
+               }
                 public static void developerCommand(MessageReceivedEvent event, List<String> args) throws IOException{
                     event.getGuild().getUserByID(221536817969627136L).getOrCreatePMChannel().sendMessage("User : " + event.getAuthor().getName() + " has contacted you for a possible bug.");
                 BotUtils.sendMessage(event.getChannel(), "``Builder bot developer has been contacted.``");

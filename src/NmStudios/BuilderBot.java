@@ -14,6 +14,8 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.obj.ActivityType;
+import sx.blah.discord.handle.obj.StatusType;
 import sx.blah.discord.util.DiscordException;
 
 /**
@@ -47,11 +49,22 @@ IDiscordClient client = createClient("NDQwNTQ2NDg2MDE1NzU0MjYw.DcjSgg.YXzhd5AC56
 CommandHandler handler = new Discord4JHandler(client);
 client.getDispatcher().registerListener(new Run());
 handler.registerCommand(new Run());
-File f = new File("C:/customers/nullvalue123323");
+// Config creation 
+
+// Creates folder.
+File f = new File("C:/builderbot/null");
 f.getParentFile().mkdirs();
-File f2 = new File("C:/items/nullvalue123323");
-f2.getParentFile().mkdirs();
+
+// Checks if config exists
+if(new File("C:/builderbot/config.properties").exists()){
+    // Reports existance.
+    System.out.println("Exists.");
+} else if(!(new File("C:/builderbot/config.properties").exists())){
+    // Creates the config with the prefix "b+".
+    FileUtils.createUserData("b+");
+}
 new logs().setVisible(true);
+client.changePresence(StatusType.ONLINE, ActivityType.WATCHING, "PC Architect Discord Server");
     }
     
     
